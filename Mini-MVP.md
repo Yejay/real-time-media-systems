@@ -333,3 +333,6 @@ python -c "import whisper; whisper.load_model('base')"
 **Nächster Schritt:** Sofort anfangen mit Day 1 Setup!  
 **Review-Termin:** [Heute + 7 Tage]  
 **Fallback:** Falls Probleme auftreten, auf Whisper "tiny" model wechseln für mehr Speed
+
+
+cd /Users/yejay/dev/repos/university/real-time-media-systems && source whisper-env/bin/activate && python main.py test_videos/test5-de.mp4
