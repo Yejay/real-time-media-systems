@@ -1,0 +1,4 @@
+# Minimal dependencies for whisper-stt-poc
+openai-whisper==20231117
+ffmpeg-python==0.2.0
+keybert==0.8.4  # optional for keyword extraction
