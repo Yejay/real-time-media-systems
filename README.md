@@ -139,8 +139,6 @@ result = model.transcribe(audio_path, language=None)  # Auto-detect
 The project includes sample videos in `test_videos/`:
 
 - `test5-de.mp4` - German test video
-- `test4-de.mp4` - German test video
-- `test3.mp4` - Short test (3m42s)
 
 ### Quality Checklist
 
