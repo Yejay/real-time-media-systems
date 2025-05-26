@@ -65,6 +65,9 @@ test_videos/*.mkv
 test_videos/*.webm
 test_videos/*.flv
 
+# Exception for our main test file (small enough for Git)
+!test_videos/test5-de.mp4
+
 # Output files (generated content)
 output/*.srt
 output/*.txt
