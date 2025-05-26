@@ -9,8 +9,7 @@ whisper-stt-poc/
 ├── srt_generator.py     # Whisper → SRT (uses 'small' model)
 ├── keyword_extractor.py # Optional keyword extraction
 ├── requirements.txt     # Dependencies
-├── setup.sh            # One-time setup script
-├── fix_ssl.sh          # SSL fix (only if needed)
+├── setup.sh            # Cross-platform setup (includes SSL fix)
 ├── .gitignore          # Git exclusions
 ├── README.md           # Documentation
 ├── Mini-MVP.md         # Original project plan
