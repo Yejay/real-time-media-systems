@@ -202,6 +202,50 @@ done
 
 ---
 
+## 🎬 Using SRT Files with Video Players
+
+The generated SRT files can be used with most video players to display subtitles. Here's how:
+
+### Method 1: Same Filename (Automatic)
+
+1. Rename the SRT file to match your video file name:
+   ```bash
+   # If your video is named my_lecture.mp4
+   # Rename the SRT file to my_lecture.srt
+   mv output/my_lecture.srt path/to/my_lecture.srt
+   ```
+2. Place both files in the same directory
+3. Open the video file in your player - subtitles will load automatically
+
+### Method 2: Manual Loading
+
+#### In VLC Player:
+1. Open your video in VLC
+2. Click on "Subtitle" in the menu
+3. Select "Add Subtitle File..." 
+4. Browse and select your SRT file from the output folder
+
+#### In IINA (macOS):
+1. Open your video in IINA
+2. Drag and drop the SRT file into the player window
+   OR
+3. Right-click → Subtitles → Open Subtitle File...
+4. Select your SRT file from the output folder
+
+### Method 3: Drag and Drop (Easiest)
+
+1. Drag both the video file AND the SRT file into the player window simultaneously
+2. The player will recognize them as a pair and load the subtitles automatically
+
+### Troubleshooting Subtitle Display
+
+- **Subtitles not showing:** Check if subtitles are enabled in the player settings
+- **Encoding issues:** Make sure your player uses UTF-8 encoding for subtitles
+- **Timing off:** Some players allow adjusting subtitle timing through settings
+- **Wrong language:** Ensure correct language is selected in subtitle preferences
+
+---
+
 ## 📚 Documentation
 
 - **Technical Details:** See `TECHNICAL-DOCUMENTATION.md`
