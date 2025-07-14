@@ -1,8 +1,8 @@
 # Automatic Subtitle Generator
 
-Ein Python-Script zur automatischen Untertitel-Generierung aus Videos mit OpenAI Whisper.
+A Python application for automatically generating subtitles from video files using OpenAI Whisper.
 
-**🎯 Converts any video to SRT subtitle files with German language support**
+## 🎯 Converts any video to SRT subtitle files with multi-language support
 
 ---
 
@@ -27,9 +27,22 @@ source whisper-env/bin/activate
 
 ### 3. Convert your first video
 
+**Interactive Mode (Recommended):**
 ```bash
-# Convert any video to SRT subtitles
+# Launch interactive menu (easiest way)
+python main.py
+
+# Or use the dedicated interactive launcher
+python interactive.py
+```
+
+**Command Line Mode:**
+```bash
+# Basic usage (German language, small model)
 python main.py path/to/your/video.mp4
+
+# With custom model and language
+python main.py video.mp4 --model medium --language en
 
 # Example with test video
 python main.py test_videos/test5-de.mp4
@@ -37,16 +50,35 @@ python main.py test_videos/test5-de.mp4
 
 **That's it!** Your SRT subtitle file will be saved in the `output/` folder.
 
+### 4. Choose Your Interface
+
+**🎮 Interactive Mode (Beginner-Friendly)**
+- Menu-driven interface
+- File browser and settings
+- No need to remember commands
+- Built-in help and examples
+
+**⌨️ Command Line Mode (Advanced)**
+- Fast for scripting and automation
+- All features available via flags
+- Perfect for batch operations
+- Integration with other tools
+
 ---
 
 ## ✨ Features
 
-- 🎥 **Video Support:** MP4, AVI, MOV, MKV, and more
-- 🇩🇪 **German Language:** Optimized for German speech recognition
-- ⚡ **Fast Processing:** Efficient Whisper 'small' model
+- 🎥 **Video Support:** MP4, AVI, MOV, MKV, and more (all ffmpeg-compatible formats)
+- 🌍 **Multi-Language:** Support for German, English, and auto-detection
+- ⚡ **Multiple Models:** Choose from tiny, base, small, medium, or large Whisper models
 - 📝 **SRT Output:** Standard subtitle format compatible with all players
 - 🔧 **Easy Setup:** One-command installation with SSL fixes included
 - 📊 **Progress Tracking:** Real-time processing updates
+- 🗂️ **Smart Cleanup:** Automatic temporary file management
+- 📊 **Subtitle Preview:** Quality analysis and preview functionality
+- 📁 **Batch Processing:** Process multiple videos at once
+- 🌍 **Auto Language Detection:** Automatically detect video language
+- 🎮 **Interactive CLI:** User-friendly menu system
 - 🏷️ **Keyword Extraction:** Optional keyword extraction with KeyBERT
 
 ---
@@ -55,10 +87,16 @@ python main.py test_videos/test5-de.mp4
 
 ```text
 real-time-media-systems/
-├── main.py              # 🎯 Main entry point
+├── main.py              # 🎯 Main entry point with CLI interface
 ├── audio_extractor.py   # 🎵 Video → Audio conversion
 ├── srt_generator.py     # 📝 Whisper → SRT generation
+├── subtitle_preview.py  # 📊 Subtitle preview and analysis
+├── batch_processor.py   # 📁 Batch processing functionality
+├── language_detector.py # 🌍 Automatic language detection
+├── cli_menu.py          # 🎮 Interactive CLI menu system
+├── interactive.py       # 🎯 Interactive mode launcher
 ├── keyword_extractor.py # 🏷️ Optional keyword extraction
+├── utils.py             # 🔧 Utility functions and helpers
 ├── requirements.txt     # 📦 Python dependencies
 ├── setup.sh            # ⚙️ Automatic setup script
 ├── test_videos/        # 🎬 Sample videos for testing
@@ -69,17 +107,46 @@ real-time-media-systems/
 
 ## 💻 Usage Examples
 
-### Basic Usage
+### 🎮 Interactive Mode (Recommended)
 
 ```bash
-# Convert a single video
+# Launch interactive menu
+python main.py
+
+# Follow the prompts:
+# 1. Choose "Process Single Video" or "Batch Process Videos"
+# 2. Select your video file(s) using the file browser
+# 3. Configure settings (model, language, preview)
+# 4. Start processing
+```
+
+**Interactive Features:**
+- 📂 Built-in file browser
+- ⚙️ Settings configuration menu
+- 📊 Recent files history
+- 🎯 Step-by-step guidance
+- 💡 Built-in help and examples
+
+### ⌨️ Command Line Mode
+
+```bash
+# Basic usage
 python main.py my_video.mp4
 
-# Convert with full path
-python main.py /path/to/your/video.mp4
+# With custom settings
+python main.py video.mp4 --model medium --language en
 
-# The SRT file will be saved as:
-# output/my_video.srt
+# Automatic language detection
+python main.py video.mp4 --language auto
+
+# Show subtitle preview
+python main.py video.mp4 --preview
+
+# Batch processing
+python main.py videos/ --batch --recursive
+
+# Get help
+python main.py --help
 ```
 
 ### Supported Formats
@@ -91,28 +158,53 @@ python main.py /path/to/your/video.mp4
 
 ## ⚙️ Configuration
 
-### Whisper Model Sizes
+### Model Selection
 
-You can adjust the Whisper model in `srt_generator.py` for different speed/quality trade-offs:
+Choose the appropriate Whisper model based on your needs:
 
-```python
-# Available models (speed vs. accuracy):
-model = whisper.load_model("tiny")    # Fastest
-model = whisper.load_model("base")    # Standard
-model = whisper.load_model("small")   # ⭐ Currently used (best balance)
-model = whisper.load_model("medium")  # Better quality
-model = whisper.load_model("large")   # Best quality, slowest
+| Model | Speed | Quality | Use Case |
+|-------|--------|---------|----------|
+| `tiny` | Fastest | Basic | Quick tests, real-time processing |
+| `base` | Fast | Good | General use, faster processing |
+| `small` | Medium | Better | **Default** - Best balance |
+| `medium` | Slow | High | High-quality transcription |
+| `large` | Slowest | Best | Maximum accuracy needed |
+
+```bash
+# Examples:
+python main.py video.mp4 --model tiny     # Fastest processing
+python main.py video.mp4 --model large    # Best quality
 ```
 
-### Language Settings
+### Language Options
 
-Default is German. Change in `srt_generator.py`:
+Specify the language for better accuracy:
 
-```python
-result = model.transcribe(audio_path, language="de")  # German
-result = model.transcribe(audio_path, language="en")  # English
-result = model.transcribe(audio_path, language=None)  # Auto-detect
+```bash
+python main.py video.mp4 --language de    # German (default)
+python main.py video.mp4 --language en    # English
+python main.py video.mp4 --language fr    # French
+python main.py video.mp4 --language auto  # Auto-detect
 ```
+
+Common language codes: `en` (English), `de` (German), `es` (Spanish), `fr` (French), `it` (Italian), `pt` (Portuguese), `ru` (Russian), `ja` (Japanese), `ko` (Korean), `zh` (Chinese)
+
+### Automatic Language Detection
+
+Let Whisper automatically detect the language:
+
+```bash
+python main.py video.mp4 --language auto        # Auto-detect language
+python main.py video.mp4 --auto-detect          # Alternative flag
+```
+
+**How it works:**
+- Analyzes first 30 seconds of audio
+- Shows detected language with confidence level
+- Asks for confirmation if confidence is low
+- Falls back to manual selection if needed
+
+**Supported languages:** 90+ languages including all major European, Asian, and world languages
 
 ---
 
@@ -136,16 +228,28 @@ result = model.transcribe(audio_path, language=None)  # Auto-detect
 
 ### Test Videos Available
 
-The project includes sample videos in `test_videos/`:
-
-- `test5-de.mp4` - German test video
+The project includes sample videos in `test_videos/` for testing different scenarios.
 
 ### Quality Checklist
 
-- [ ] SRT file opens in video player (VLC, etc.)
-- [ ] Subtitles are roughly synchronized (±2 seconds OK)
-- [ ] German umlauts display correctly
-- [ ] No empty subtitle segments
+When testing your generated subtitles:
+
+- [ ] SRT file opens in video player (VLC, IINA, etc.)
+- [ ] Subtitles are synchronized with audio (±2 seconds acceptable)
+- [ ] Special characters display correctly (umlauts, accents, etc.)
+- [ ] No empty or malformed subtitle segments
+- [ ] Text is readable and makes sense
+
+### Quick Test
+
+```bash
+# Test with included sample video
+python main.py test_videos/test5-de.mp4
+
+# Test with different models
+python main.py test_videos/test5-de.mp4 --model tiny
+python main.py test_videos/test5-de.mp4 --model medium
+```
 
 ---
 
@@ -209,23 +313,27 @@ The generated SRT files can be used with most video players to display subtitles
 ### Method 1: Same Filename (Automatic)
 
 1. Rename the SRT file to match your video file name:
+
    ```bash
    # If your video is named my_lecture.mp4
    # Rename the SRT file to my_lecture.srt
    mv output/my_lecture.srt path/to/my_lecture.srt
    ```
+
 2. Place both files in the same directory
 3. Open the video file in your player - subtitles will load automatically
 
 ### Method 2: Manual Loading
 
-#### In VLC Player:
+#### In VLC Player
+
 1. Open your video in VLC
 2. Click on "Subtitle" in the menu
-3. Select "Add Subtitle File..." 
+3. Select "Add Subtitle File..."
 4. Browse and select your SRT file from the output folder
 
-#### In IINA (macOS):
+#### In IINA (macOS)
+
 1. Open your video in IINA
 2. Drag and drop the SRT file into the player window
    OR
@@ -246,19 +354,14 @@ The generated SRT files can be used with most video players to display subtitles
 
 ---
 
-## 📚 Documentation
-
-- **Technical Details:** See `TECHNICAL-DOCUMENTATION.md`
-- **Project Planning:** See `Mini-MVP.md`
-- **Development Status:** See `PROJECT-STATUS.md`
-
----
-
 ## 🤝 Project Info
 
-**Course:** Real-Time Media Systems  
-**Team:** Yejay Demirkan, Marcus Schumann, Vasiliki Ioannidou  
-**Semester:** SoSe 2025  
+**Course:** Real-Time Media Systems
+
+**Team:** Yejay Demirkan, Marcus Schumann, Vasiliki Ioannidou
+
+**Semester:** SoSe 2025
+
 **Goal:** Automatic subtitle generation for university video platform
 
 ### Technologies Used
