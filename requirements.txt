@@ -1,6 +1,11 @@
-# Dependencies for automatic subtitle generator
+# Core dependencies for automatic subtitle generator
 openai-whisper==20231117
 ffmpeg-python==0.2.0
-keybert==0.8.4  # optional for keyword extraction
+keybert==0.8.4  # keyword extraction
 tqdm==4.66.1    # progress bars
 rich==13.7.0    # enhanced terminal output
+
+# Chapter generation dependencies
+scikit-learn>=1.5.0  # topic modeling for chapter detection (compatible with numpy 2.x)
+nltk==3.8.1     # natural language processing
+textstat==0.7.3 # text analysis and readability

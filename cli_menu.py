@@ -16,6 +16,13 @@ from batch_processor import BatchProcessor
 from language_detector import LanguageDetector
 from utils import print_header, print_success, print_error, print_info, console
 
+# Check if chapter generation is available
+try:
+    from chapter_generator import ChapterGenerator
+    CHAPTERS_AVAILABLE = True
+except ImportError:
+    CHAPTERS_AVAILABLE = False
+
 
 class InteractiveCLI:
     """Interactive command-line interface for subtitle generation"""
@@ -25,6 +32,7 @@ class InteractiveCLI:
             'model': 'small',
             'language': 'auto',
             'preview': True,
+            'chapters': True,
             'output_dir': 'output'
         }
         self.batch_processor = BatchProcessor()
@@ -111,6 +119,14 @@ class InteractiveCLI:
                 "✅ Enabled" if self.settings['preview'] else "❌ Disabled", 
                 "Show subtitle preview after generation"
             )
+            chapters_status = "✅ Enabled" if self.settings['chapters'] else "❌ Disabled"
+            if not CHAPTERS_AVAILABLE:
+                chapters_status += " (⚠️ Dependencies missing)"
+            settings_table.add_row(
+                "Chapters", 
+                chapters_status, 
+                "Generate YouTube-style chapter timestamps"
+            )
             settings_table.add_row(
                 "Output Directory", 
                 self.settings['output_dir'], 
@@ -124,8 +140,9 @@ class InteractiveCLI:
                 ("1", "🤖 Change Model", "Select Whisper model size"),
                 ("2", "🌍 Change Language", "Set default language or auto-detection"),
                 ("3", "👁️  Toggle Preview", "Enable/disable subtitle preview"),
-                ("4", "📁 Output Directory", "Change output directory"),
-                ("5", "🔄 Reset to Defaults", "Reset all settings to defaults"),
+                ("4", "📺 Toggle Chapters", "Enable/disable YouTube chapter generation"),
+                ("5", "📁 Output Directory", "Change output directory"),
+                ("6", "🔄 Reset to Defaults", "Reset all settings to defaults"),
                 ("b", "⬅️  Back to Main Menu", "Return to main menu")
             ]
             
@@ -133,7 +150,7 @@ class InteractiveCLI:
             
             choice = Prompt.ask(
                 "\n[bold cyan]Configure setting[/bold cyan]",
-                choices=["1", "2", "3", "4", "5", "b"],
+                choices=["1", "2", "3", "4", "5", "6", "b"],
                 default="b"
             )
             
@@ -146,8 +163,17 @@ class InteractiveCLI:
                 status = "enabled" if self.settings['preview'] else "disabled"
                 print_success(f"Preview {status}")
             elif choice == "4":
-                self.configure_output_directory()
+                if not CHAPTERS_AVAILABLE:
+                    print_error("Chapter generation not available - missing dependencies")
+                    print_info("Install with: pip install nltk scikit-learn textstat")
+                    console.input("Press Enter to continue...")
+                else:
+                    self.settings['chapters'] = not self.settings['chapters']
+                    status = "enabled" if self.settings['chapters'] else "disabled"
+                    print_success(f"Chapter generation {status}")
             elif choice == "5":
+                self.configure_output_directory()
+            elif choice == "6":
                 if Confirm.ask("Reset all settings to defaults?"):
                     self.reset_settings()
                     print_success("Settings reset to defaults")
@@ -254,6 +280,7 @@ class InteractiveCLI:
             'model': 'small',
             'language': 'auto',
             'preview': True,
+            'chapters': True,
             'output_dir': 'output'
         }
     
@@ -527,6 +554,7 @@ class InteractiveCLI:
         config_table.add_row("Model", self.settings['model'])
         config_table.add_row("Language", self.settings['language'])
         config_table.add_row("Preview", "Yes" if self.settings['preview'] else "No")
+        config_table.add_row("Chapters", "Yes" if self.settings['chapters'] else "No")
         config_table.add_row("Output Dir", self.settings['output_dir'])
         
         console.print(config_table)
@@ -543,7 +571,8 @@ class InteractiveCLI:
                 video_file, 
                 self.settings['model'], 
                 self.settings['language'], 
-                self.settings['preview']
+                self.settings['preview'],
+                self.settings['chapters']
             )
             
             print_header("🎉 Processing Complete!")
@@ -611,7 +640,8 @@ class InteractiveCLI:
                 video_file, 
                 self.settings['model'], 
                 self.settings['language'], 
-                self.settings['preview']
+                self.settings['preview'],
+                self.settings['chapters']
             )
         
         results = self.batch_processor.process_batch(video_files, batch_process_func)

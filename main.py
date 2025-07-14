@@ -14,6 +14,14 @@ from batch_processor import BatchProcessor
 from language_detector import LanguageDetector
 from utils import temp_audio_file, print_header, print_step, print_success, print_error, print_info, console
 
+# Optional chapter generation (requires additional dependencies)
+try:
+    from chapter_generator import ChapterGenerator
+    CHAPTERS_AVAILABLE = True
+except ImportError:
+    CHAPTERS_AVAILABLE = False
+    print_info("Chapter generation not available - install with: pip install nltk scikit-learn textstat")
+
 
 def parse_arguments():
     """Parse command line arguments"""
@@ -71,10 +79,17 @@ def parse_arguments():
         help="Automatically detect language before processing"
     )
     
+    parser.add_argument(
+        "--chapters",
+        action="store_true",
+        help="Generate YouTube-style chapter timestamps from content"
+    )
+    
     return parser.parse_args()
 
 
-def process_single_video(video_file: str, model_size: str, language: str, preview: bool) -> str:
+def process_single_video(video_file: str, model_size: str, language: str, preview: bool, 
+                        generate_chapters: bool = False) -> str:
     """Process a single video file and return the SRT file path"""
     base_name = Path(video_file).stem
     
@@ -123,6 +138,32 @@ def process_single_video(video_file: str, model_size: str, language: str, previe
             audio_file, base_name, model_size, language
         )
         
+        # Generate chapters if requested
+        if generate_chapters:
+            if not CHAPTERS_AVAILABLE:
+                print_error("Chapter generation not available - missing dependencies")
+                print_info("Install with: pip install nltk scikit-learn textstat")
+            else:
+                chapter_step = step_num + 2
+                total_steps += 1
+                print_step(chapter_step, total_steps, "Chapter Generation", "Creating YouTube-style chapters from content")
+                
+                try:
+                    chapter_generator = ChapterGenerator()
+                    chapter_summary = chapter_generator.process_srt_for_chapters(srt_file, base_name)
+                    
+                    if chapter_summary.get('chapters'):
+                        print_success(f"Generated {chapter_summary['total_chapters']} chapters")
+                        if preview:
+                            console.print()
+                            chapter_generator.show_chapter_preview(chapter_summary)
+                    else:
+                        print_info("No distinct chapters detected in content")
+                        
+                except Exception as e:
+                    print_error(f"Chapter generation failed: {e}")
+                    print_info("Continuing without chapters...")
+        
         return srt_file
 
 
@@ -161,7 +202,7 @@ def main():
         
         # Process batch
         def batch_process_func(video_file):
-            return process_single_video(video_file, args.model, args.language, args.preview)
+            return process_single_video(video_file, args.model, args.language, args.preview, args.chapters)
         
         results = batch_processor.process_batch(video_files, batch_process_func)
         batch_processor.show_batch_results()
@@ -195,7 +236,7 @@ def main():
         sys.exit(1)
     
     try:
-        srt_file = process_single_video(video_file, args.model, args.language, args.preview)
+        srt_file = process_single_video(video_file, args.model, args.language, args.preview, args.chapters)
         
         print_header("🎉 PROCESSING COMPLETE!", "Your subtitles are ready!")
         print_success(f"SRT file saved to: {srt_file}")

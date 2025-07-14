@@ -9,7 +9,7 @@ def extract_keywords(text: str, output_name: str, num_keywords: int = 10) -> str
     
     # Extract keywords
     keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 2), 
-                                       stop_words='german', top_k=num_keywords)
+                                       stop_words='german', top_n=num_keywords)
     
     # Format keywords
     keyword_content = "# Extracted Keywords\n\n"
